@@ -12,7 +12,7 @@ import MetaData from '../Layouts/MetaData';
 import MinCategory from '../Layouts/MinCategory';
 import OrderItem from './OrderItem';
 
-const orderStatus = ['pending', 'Shipped', 'Delivered'];
+const orderStatus = ['processing', 'shipped', 'delivered'];
 const dt = new Date();
 const ordertime = [dt.getMonth(), dt.getFullYear() - 1, dt.getFullYear() - 2];
 

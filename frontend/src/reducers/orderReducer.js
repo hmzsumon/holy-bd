@@ -4,6 +4,10 @@ import {
   ALL_ORDERS_SUCCESS,
   CLEAR_ERRORS,
   DELETE_ORDER_FAIL,
+  DELETE_ORDER_ITEM_FAIL,
+  DELETE_ORDER_ITEM_REQUEST,
+  DELETE_ORDER_ITEM_RESET,
+  DELETE_ORDER_ITEM_SUCCESS,
   DELETE_ORDER_REQUEST,
   DELETE_ORDER_RESET,
   DELETE_ORDER_SUCCESS,
@@ -20,6 +24,10 @@ import {
   PAYMENT_STATUS_REQUEST,
   PAYMENT_STATUS_SUCCESS,
   UPDATE_ORDER_FAIL,
+  UPDATE_ORDER_ITEM_FAIL,
+  UPDATE_ORDER_ITEM_REQUEST,
+  UPDATE_ORDER_ITEM_RESET,
+  UPDATE_ORDER_ITEM_SUCCESS,
   UPDATE_ORDER_REQUEST,
   UPDATE_ORDER_RESET,
   UPDATE_ORDER_SUCCESS,
@@ -204,6 +212,54 @@ export const orderReducer = (state = {}, { type, payload }) => {
         isUpdated: false,
       };
     case DELETE_ORDER_RESET:
+      return {
+        ...state,
+        isDeleted: false,
+      };
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        error: null,
+      };
+    default:
+      return state;
+  }
+};
+
+// update orderItem
+export const updateOrderItemReducer = (state = {}, { type, payload }) => {
+  switch (type) {
+    case UPDATE_ORDER_ITEM_REQUEST:
+    case DELETE_ORDER_ITEM_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+    case UPDATE_ORDER_ITEM_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        isUpdated: payload,
+      };
+    case DELETE_ORDER_ITEM_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        isDeleted: payload,
+      };
+    case UPDATE_ORDER_ITEM_FAIL:
+    case DELETE_ORDER_ITEM_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: payload,
+      };
+    case UPDATE_ORDER_ITEM_RESET:
+      return {
+        ...state,
+        isUpdated: false,
+      };
+    case DELETE_ORDER_ITEM_RESET:
       return {
         ...state,
         isDeleted: false,

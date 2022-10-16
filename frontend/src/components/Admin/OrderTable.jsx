@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   clearErrors,
   deleteOrder,
-  getAllOrders
+  getAllOrders,
 } from '../../actions/orderAction';
 import { DELETE_ORDER_RESET } from '../../constants/orderConstants';
 import { formatDate } from '../../utils/functions';
@@ -17,7 +17,7 @@ const OrderTable = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { orders, error,  } = useSelector((state) => state.allOrders);
+  const { orders, error } = useSelector((state) => state.allOrders);
 
   const {
     loading,
@@ -129,7 +129,7 @@ const OrderTable = () => {
         itemsQty: order.item_qty,
         amount: order.total,
         orderOn: formatDate(order.created_at),
-        status: order.status,
+        status: order.order_status,
       });
     });
 

@@ -9,6 +9,7 @@ import {
   orderDetailsReducer,
   orderReducer,
   paymentStatusReducer,
+  updateOrderItemReducer,
 } from './reducers/orderReducer';
 import {
   newProductReducer,
@@ -72,6 +73,9 @@ const reducer = combineReducers({
 
   // service
   service: serviceReducer,
+
+  // update order item
+  updateOrderItem: updateOrderItemReducer,
 });
 
 let initialState = {

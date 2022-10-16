@@ -4,26 +4,24 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import {
-  clearErrors,
-  getOrderDetails,
-  updateOrder,
-} from '../../actions/orderAction';
+import { clearErrors, getOrderDetails } from '../../actions/orderAction';
 import { UPDATE_ORDER_RESET } from '../../constants/orderConstants';
 import { formatDate } from '../../utils/functions';
 import MetaData from '../Layouts/MetaData';
 import TrackStepper from '../Order/TrackStepper';
 import Loading from './Loading';
+import UpdateOrderItems from './UpdateOrderItems';
 
 const UpdateOrder = () => {
+  const { order, error, loading, orderItems } = useSelector(
+    (state) => state.orderDetails
+  );
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const params = useParams();
 
   const [status, setStatus] = useState('');
 
-  const { order, error, loading } = useSelector((state) => state.orderDetails);
-  console.log(order);
   const { isUpdated, error: updateError } = useSelector((state) => state.order);
 
   useEffect(() => {
@@ -46,7 +44,7 @@ const UpdateOrder = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.set('status', status);
-    dispatch(updateOrder(params.id, formData));
+    // dispatch(updateOrder(params.id, formData));
   };
 
   return (
@@ -67,12 +65,12 @@ const UpdateOrder = () => {
                 Go Back
               </Link>
 
-              <div className='flex flex-col sm:flex-row bg-white shadow-lg rounded-lg min-w-full'>
-                <div className='sm:w-1/2 border-r'>
+              <div className='flex flex-col  bg-white shadow-lg rounded-lg min-w-full'>
+                <div className='w-full'>
                   <div className='flex flex-col gap-3 my-8 mx-10'>
                     <h3 className='font-medium text-lg'>Delivery Address</h3>
                     <h4 className='font-medium'>{order.username}</h4>
-                    <p className='text-sm'>{`${order.address}, ${order.city}, ${order.state} - ${order.zip}`}</p>
+                    <p className='text-sm'>{`${order.address}, ${order.city}, ${order.order_status} - ${order.zip}`}</p>
                     {/* <div className='flex gap-2 text-sm'>
                       <p className='font-medium'>Email</p>
                       <p>{order.user.email}</p>
@@ -84,109 +82,74 @@ const UpdateOrder = () => {
                   </div>
                 </div>
 
-                <form
-                  onSubmit={updateOrderSubmitHandler}
-                  className='flex flex-col gap-3 p-8'
-                >
+                <div className='flex flex-col gap-3 p-8'>
+                  {/* Service Items */}
+                  {orderItems &&
+                    orderItems.map((item) => {
+                      return (
+                        <div key={item.id}>
+                          <UpdateOrderItems item={item} />
+                        </div>
+                      );
+                    })}
+                  {/* Update Status */}
                   <h3 className='font-medium text-lg'>Update Status</h3>
-                  <div className='flex gap-2'>
-                    <p className='text-sm font-medium'>Current Status:</p>
-                    <p className='text-sm'>
-                      {order.orderStatus === 'Shipped' &&
-                        `Shipped on ${formatDate(order.shippedAt)}`}
-                      {order.orderStatus === 'Processing' &&
-                        `Ordered on ${formatDate(order.createdAt)}`}
-                      {order.orderStatus === 'Delivered' &&
-                        `Delivered on ${formatDate(order.deliveredAt)}`}
-                    </p>
-                  </div>
-                  <FormControl fullWidth sx={{ marginTop: 1 }}>
-                    <InputLabel id='order-status-select-label'>
-                      Status
-                    </InputLabel>
-                    <Select
-                      labelId='order-status-select-label'
-                      id='order-status-select'
-                      value={status}
-                      label='Status'
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      {order.orderStatus === 'Shipped' && (
-                        <MenuItem value={'Delivered'}>Delivered</MenuItem>
-                      )}
-                      {order.orderStatus === 'Processing' && (
-                        <MenuItem value={'Shipped'}>Shipped</MenuItem>
-                      )}
-                      {order.orderStatus === 'Delivered' && (
-                        <MenuItem value={'Delivered'}>Delivered</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                  <button
-                    type='submit'
-                    className='bg-primary-orange p-2.5 text-white font-medium rounded shadow hover:shadow-lg'
-                  >
-                    Update
-                  </button>
-                </form>
-              </div>
-
-              {order.orderItems &&
-                order.orderItems.map((item) => {
-                  const { _id, image, name, price, quantity } = item;
-
-                  return (
-                    <div
-                      className='flex flex-col sm:flex-row min-w-full shadow-lg rounded-lg bg-white px-2 py-5'
-                      key={_id}
-                    >
-                      <div className='flex flex-col sm:flex-row sm:w-1/2 gap-1'>
-                        <div className='w-full sm:w-32 h-24'>
-                          <img
-                            draggable='false'
-                            className='h-full w-full object-contain'
-                            src={image}
-                            alt={name}
-                          />
-                        </div>
-                        <div className='flex flex-col gap-1 overflow-hidden'>
-                          <p className='text-sm'>
-                            {name.length > 45
-                              ? `${name.substring(0, 45)}...`
-                              : name}
-                          </p>
-                          <p className='text-xs text-gray-600 mt-2'>
-                            Quantity: {quantity}
-                          </p>
-                          <p className='text-xs text-gray-600'>
-                            Price: ৳{price.toLocaleString()}
-                          </p>
-                          <span className='font-medium'>
-                            Total: ৳{(quantity * price).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-
+                  <div>
+                    <div className='flex gap-2'>
+                      <p className='text-sm font-medium'>Current Status:</p>
+                      <p className='text-sm'>
+                        {order.orderStatus === 'Shipped' &&
+                          `Shipped on ${formatDate(order.shipped_at)}`}
+                        {order.orderStatus === 'Processing' &&
+                          `Ordered on ${formatDate(order.created_at)}`}
+                        {order.orderStatus === 'Delivered' &&
+                          `Delivered on ${formatDate(order.deliveredAt)}`}
+                      </p>
+                    </div>
+                    <div>
+                      <FormControl fullWidth sx={{ marginTop: 1 }}>
+                        <InputLabel id='order-status-select-label'>
+                          Status
+                        </InputLabel>
+                        <Select
+                          labelId='order-status-select-label'
+                          id='order-status-select'
+                          value={status}
+                          label='Status'
+                          onChange={(e) => setStatus(e.target.value)}
+                        >
+                          {order.order_status === 'shipped' && (
+                            <MenuItem value={'delivered'}>Delivered</MenuItem>
+                          )}
+                          {order.order_status === 'processing' && (
+                            <MenuItem value={'Shipped'}>Shipped</MenuItem>
+                          )}
+                          {order.order_status === 'Delivered' && (
+                            <MenuItem value={'Delivered'}>Delivered</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
                       <div className='flex flex-col w-full sm:w-1/2'>
                         <h3 className='font-medium sm:text-center'>
                           Order Status
                         </h3>
                         <TrackStepper
-                          orderOn={order.createdAt}
+                          orderOn={order.created_at}
                           shippedAt={order.shippedAt}
                           deliveredAt={order.deliveredAt}
                           activeStep={
-                            order.orderStatus === 'Delivered'
+                            order.status === 'pending'
                               ? 2
-                              : order.orderStatus === 'Shipped'
+                              : order.status === 'Shipped'
                               ? 1
                               : 0
                           }
                         />
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </>

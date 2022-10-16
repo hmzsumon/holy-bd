@@ -8,13 +8,15 @@ CREATE TABLE service_orders (
     total NUMERIC(20,2) NOT NULL,
     address VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
-    state VARCHAR(255) NOT NULL,
+    order_status VARCHAR(255) DEFAULT 'processing',
     zip VARCHAR(255) NOT NULL,
     country VARCHAR(255) NOT NULL,
     phone VARCHAR(255) NOT NULL,
-    status VARCHAR(255) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    delivered_at TIMESTAMP DEFAULT NULL,
+    bill_start_at TIMESTAMP DEFAULT NULL,
+    shipped_at TIMESTAMP DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -38,7 +40,7 @@ CREATE TABLE service_order_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (service_order_id) REFERENCES service_orders(id),
-    FOREIGN KEY (service_id) REFERENCES services(id)
+    FOREIGN KEY (service_id) REFERENCES services(id),
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

@@ -212,3 +212,46 @@ exports.getAllOrders = asyncErrorHandler(async (req, res, next) => {
     orderItems,
   });
 });
+
+// update orderItems
+exports.updateServiceOrderItem = asyncErrorHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { discount } = req.body;
+
+  // find service_order_items by id
+  const { rows: orderItems } = await db.query(
+    'SELECT * FROM service_order_items WHERE id = $1',
+    [id]
+  );
+
+  const total = orderItems[0].total - discount;
+
+  // update service_order_items total && discount
+  const { rows } = await db.query(
+    'UPDATE service_order_items SET total = $1, discount = $2 WHERE id = $3 RETURNING *',
+    [total, discount, id]
+  );
+
+  // update service_orders total
+  const { rows: order } = await db.query(
+    'SELECT * FROM service_orders WHERE id = $1',
+    [orderItems[0].service_order_id]
+  );
+
+  let orderDiscount = Number(order[0].discount) + Number(discount);
+  const orderTotal = order[0].total - discount;
+
+  // console.log(orderDiscount);
+
+  // console.log(orderTotal, orderDiscount);
+
+  // update order total
+  await db.query(
+    'UPDATE service_orders SET total = $1, discount = $2 WHERE id = $3 RETURNING *',
+    [orderTotal, orderDiscount, orderItems[0].service_order_id]
+  );
+
+  res.status(200).json({
+    success: true,
+  });
+});

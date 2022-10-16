@@ -20,6 +20,9 @@ import {
   PAYMENT_STATUS_REQUEST,
   PAYMENT_STATUS_SUCCESS,
   UPDATE_ORDER_FAIL,
+  UPDATE_ORDER_ITEM_FAIL,
+  UPDATE_ORDER_ITEM_REQUEST,
+  UPDATE_ORDER_ITEM_SUCCESS,
   UPDATE_ORDER_REQUEST,
   UPDATE_ORDER_SUCCESS,
 } from '../constants/orderConstants';
@@ -78,6 +81,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
     dispatch({ type: ORDER_DETAILS_REQUEST });
 
     const { data } = await axios.get(`/api/v1/order/${id}`);
+    console.log(data);
 
     dispatch({
       type: ORDER_DETAILS_SUCCESS,
@@ -171,6 +175,27 @@ export const deleteOrder = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: DELETE_ORDER_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+// update order item
+export const updateOrderItem = (id, orderItem) => async (dispatch) => {
+  try {
+    dispatch({ type: UPDATE_ORDER_ITEM_REQUEST });
+
+    const { data } = await axios.put(
+      `/api/v1/update/orderItems/${id}`,
+      orderItem
+    );
+    dispatch({
+      type: UPDATE_ORDER_ITEM_SUCCESS,
+      payload: data.success,
+    });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_ORDER_ITEM_FAIL,
       payload: error.response.data.message,
     });
   }

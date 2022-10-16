@@ -6,6 +6,7 @@ const {
   getAllOrders,
   updateOrder,
   deleteOrder,
+  updateServiceOrderItem,
 } = require('../controllers/orderController');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
@@ -23,5 +24,10 @@ router
   .route('/admin/order/:id')
   .put(isAuthenticatedUser, authorizeRoles('admin'), updateOrder)
   .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteOrder);
+
+// update order items by admin
+router
+  .route('/update/orderItems/:id')
+  .put(isAuthenticatedUser, authorizeRoles('admin'), updateServiceOrderItem);
 
 module.exports = router;

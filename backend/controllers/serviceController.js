@@ -189,19 +189,8 @@ exports.newServiceOrder = asyncErrorHandler(async (req, res, next) => {
     req.body;
 
   const { rows } = await db.query(
-    'INSERT INTO service_orders (user_id, username, item_qty, total, address, city, state, zip, country, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
-    [
-      user_id,
-      username,
-      item_qty,
-      total,
-      address,
-      city,
-      state,
-      zip,
-      country,
-      phone,
-    ]
+    'INSERT INTO service_orders (user_id, username, item_qty, total, address, city, zip, country, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+    [user_id, username, item_qty, total, address, city, zip, country, phone]
   );
 
   const orderItems = req.body.orderItems;

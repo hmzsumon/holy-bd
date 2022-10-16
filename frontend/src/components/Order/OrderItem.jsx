@@ -9,11 +9,10 @@ const OrderItem = (props) => {
     orderId,
     service_name,
     icon_url,
-
     unit_price,
     quantity,
-    createdAt,
-    deliveredAt,
+    created_at,
+    delivered_at,
     orderStatus,
   } = props;
 
@@ -60,14 +59,14 @@ const OrderItem = (props) => {
                   <span className='text-primary-green pb-0.5'>
                     <CircleIcon sx={{ fontSize: '14px' }} />
                   </span>
-                  Delivered on {formatDate(deliveredAt)}
+                  Delivered on {formatDate(delivered_at)}
                 </>
               ) : (
                 <>
                   <span className='text-primary-green pb-0.5'>
                     <RadioButtonUncheckedIcon sx={{ fontSize: '14px' }} />
                   </span>
-                  Ordered on {formatDate(createdAt)}
+                  Ordered on {formatDate(created_at)}
                 </>
               )}
             </p>
