@@ -193,3 +193,22 @@ exports.deleteOrder = asyncErrorHandler(async (req, res, next) => {
     success: true,
   });
 });
+
+// Get All Orders ---ADMIN
+exports.getAllOrders = asyncErrorHandler(async (req, res, next) => {
+  const { rows: orders } = await db.query('SELECT * FROM service_orders');
+
+  if (!orders) {
+    return next(new ErrorHandler('Order Not Found', 404));
+  }
+
+  const { rows: orderItems } = await db.query(
+    'SELECT * FROM service_order_items'
+  );
+
+  res.status(200).json({
+    success: true,
+    orders,
+    orderItems,
+  });
+});

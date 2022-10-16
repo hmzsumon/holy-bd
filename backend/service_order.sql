@@ -46,8 +46,7 @@ CREATE TABLE service_order_items (
 -- delete multiple service_order
 DELETE FROM service_orders WHERE id IN (1,2,3);
 
--- delete all service_order_item
-DELETE FROM service_order_items;
+
 
 -- get service_order by user_id with service_order_items
 SELECT so.id, so.user_id, so.item_qty, so.discount, so.total, so.address, so.city, so.state, so.zip, so.country, so.phone, so.status, so.created_at, so.updated_at, soi.id, soi.service_order_id, soi.service_id, soi.service_name, soi.quantity, soi.unit_price, soi.unit, soi.discount, soi.total, soi.created_at, soi.updated_at FROM service_orders so LEFT JOIN service_order_items soi ON so.id = soi.service_order_id WHERE so.user_id = 1;
