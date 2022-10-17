@@ -35,6 +35,7 @@ import {
   allServicesReducer,
   serviceCreateReducer,
   serviceDetailsReducer,
+  serviceItemReducer,
   serviceReducer,
 } from './reducers/serviceReducer';
 
@@ -76,6 +77,9 @@ const reducer = combineReducers({
 
   // update order item
   updateOrderItem: updateOrderItemReducer,
+
+  // service item
+  serviceItem: serviceItemReducer,
 });
 
 let initialState = {

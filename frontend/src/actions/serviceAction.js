@@ -7,6 +7,9 @@ import {
   DELETE_SERVICE_FAIL,
   DELETE_SERVICE_REQUEST,
   DELETE_SERVICE_SUCCESS,
+  GET_SERVICE_ITEM_FAIL,
+  GET_SERVICE_ITEM_REQUEST,
+  GET_SERVICE_ITEM_SUCCESS,
   SERVICE_CREATE_FAIL,
   SERVICE_CREATE_REQUEST,
   SERVICE_CREATE_SUCCESS,
@@ -117,6 +120,21 @@ export const deleteService = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: DELETE_SERVICE_FAIL,
+      payload: error.response.data.message,
+    });
+  }
+};
+
+// get service item ---ADMIN
+export const getServiceItem = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: GET_SERVICE_ITEM_REQUEST });
+    const { data } = await axios.get(`/api/v1/service/order-item/${id}`);
+
+    dispatch({ type: GET_SERVICE_ITEM_SUCCESS, payload: data.service_item });
+  } catch (error) {
+    dispatch({
+      type: GET_SERVICE_ITEM_FAIL,
       payload: error.response.data.message,
     });
   }

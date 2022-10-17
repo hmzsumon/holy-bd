@@ -185,8 +185,7 @@ exports.getSingleOrder = asyncErrorHandler(async (req, res, next) => {
 exports.newServiceOrder = asyncErrorHandler(async (req, res, next) => {
   const user_id = req.user.user_id;
   const { username } = req.user;
-  const { item_qty, total, address, city, state, zip, country, phone } =
-    req.body;
+  const { item_qty, total, address, city, zip, country, phone } = req.body;
 
   const { rows } = await db.query(
     'INSERT INTO service_orders (user_id, username, item_qty, total, address, city, zip, country, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
@@ -199,7 +198,7 @@ exports.newServiceOrder = asyncErrorHandler(async (req, res, next) => {
   orderItems.forEach(async (item) => {
     console.log(item);
     const { rows: orderItem } = await db.query(
-      'INSERT INTO service_order_items (user_id, username, service_order_id, service_id, service_name, quantity, unit_price, unit, total,icon_url ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+      'INSERT INTO service_order_items (user_id, username, service_order_id, service_id, service_name, quantity, unit_price, unit, total,icon_url, order_total ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
       [
         user_id,
         username,
@@ -211,10 +210,11 @@ exports.newServiceOrder = asyncErrorHandler(async (req, res, next) => {
         item.unit,
         item.total,
         item.icon_url,
+        total,
       ]
     );
 
-    console.log(orderItem);
+    // console.log(orderItem);
   });
 
   res.status(200).json({
@@ -222,3 +222,25 @@ exports.newServiceOrder = asyncErrorHandler(async (req, res, next) => {
     data: rows[0],
   });
 });
+
+// get single service_order_item
+exports.getSingleServiceOrderItem = asyncErrorHandler(
+  async (req, res, next) => {
+    const { id } = req.params;
+    const { rows } = await db.query(
+      'SELECT * FROM service_order_items WHERE id = $1',
+      [id]
+    );
+
+    const item = rows[0];
+
+    if (!item) {
+      return next(new ErrorHandler('Item not found', 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      service_item: item,
+    });
+  }
+);

@@ -93,6 +93,7 @@ exports.getSingleOrderDetails = asyncErrorHandler(async (req, res, next) => {
 // Get Logged In User Orders
 exports.myOrders = asyncErrorHandler(async (req, res, next) => {
   const user_id = req.user.user_id;
+  console.log(user_id);
 
   const { rows: orders } = await db.query(
     'SELECT * FROM service_orders WHERE user_id = $1',
@@ -137,33 +138,41 @@ exports.getAllOrders = asyncErrorHandler(async (req, res, next) => {
 // Update Order Status ---ADMIN
 exports.updateOrder = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
+  const { status } = req.body;
+
+  console.log(id, status);
 
   const { rows: order } = await db.query(
     'SELECT * FROM service_orders WHERE id = $1',
     [id]
   );
 
-  if (!order) {
+  if (order.length === 0) {
     return next(new ErrorHandler('Order Not Found', 404));
   }
 
-  if (order.orderStatus === 'Delivered') {
+  // console.log(order[0].order_status);
+
+  if (order[0].order_status === 'Delivered') {
     return next(new ErrorHandler('Already Delivered', 400));
   }
 
-  if (req.body.status === 'Shipped') {
-    order.shippedAt = Date.now();
-    order.orderItems.forEach(async (i) => {
-      await updateStock(i.product, i.quantity);
-    });
+  // if status = shipped, update update order_status to shipped and shipped_at to now
+  if (status === 'Shipped') {
+    const { rows: updatedOrder } = await db.query(
+      'UPDATE service_orders SET order_status = $1, shipped_at = $2 WHERE id = $3 RETURNING *',
+      [status, new Date(), id]
+    );
   }
 
-  order.orderStatus = req.body.status;
-  if (req.body.status === 'Delivered') {
-    order.deliveredAt = Date.now();
-  }
+  // if status = delivered, update update order_status to delivered and delivered_at to now and bill_start_at to now
 
-  await order.save({ validateBeforeSave: false });
+  if (status === 'Delivered') {
+    const { rows: updatedOrder } = await db.query(
+      'UPDATE service_orders SET order_status = $1, delivered_at = $2, bill_start_at = $3 WHERE id = $4 RETURNING *',
+      [status, new Date(), new Date(), id]
+    );
+  }
 
   res.status(200).json({
     success: true,
@@ -216,7 +225,9 @@ exports.getAllOrders = asyncErrorHandler(async (req, res, next) => {
 // update orderItems
 exports.updateServiceOrderItem = asyncErrorHandler(async (req, res, next) => {
   const { id } = req.params;
-  const { discount } = req.body;
+  const { discount, quantity, total, order_total, order_discount } = req.body;
+
+  console.log(req.body);
 
   // find service_order_items by id
   const { rows: orderItems } = await db.query(
@@ -224,12 +235,10 @@ exports.updateServiceOrderItem = asyncErrorHandler(async (req, res, next) => {
     [id]
   );
 
-  const total = orderItems[0].total - discount;
-
   // update service_order_items total && discount
   const { rows } = await db.query(
-    'UPDATE service_order_items SET total = $1, discount = $2 WHERE id = $3 RETURNING *',
-    [total, discount, id]
+    'UPDATE service_order_items SET total = $1, discount = $2,  quantity = $3, order_total = $4, order_discount = $5 WHERE id = $6 RETURNING *',
+    [total, discount, quantity, order_total, order_discount, id]
   );
 
   // update service_orders total
@@ -238,9 +247,6 @@ exports.updateServiceOrderItem = asyncErrorHandler(async (req, res, next) => {
     [orderItems[0].service_order_id]
   );
 
-  let orderDiscount = Number(order[0].discount) + Number(discount);
-  const orderTotal = order[0].total - discount;
-
   // console.log(orderDiscount);
 
   // console.log(orderTotal, orderDiscount);
@@ -248,7 +254,13 @@ exports.updateServiceOrderItem = asyncErrorHandler(async (req, res, next) => {
   // update order total
   await db.query(
     'UPDATE service_orders SET total = $1, discount = $2 WHERE id = $3 RETURNING *',
-    [orderTotal, orderDiscount, orderItems[0].service_order_id]
+    [order_total, order_discount, orderItems[0].service_order_id]
+  );
+
+  // update all service_order_items order_total && order_discount
+  await db.query(
+    'UPDATE service_order_items SET order_total = $1, order_discount = $2 WHERE service_order_id = $3 RETURNING *',
+    [order_total, order_discount, orderItems[0].service_order_id]
   );
 
   res.status(200).json({

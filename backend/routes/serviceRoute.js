@@ -7,6 +7,7 @@ const {
   updateSErvice,
   deleteService,
   newServiceOrder,
+  getSingleServiceOrderItem,
 } = require('../controllers/serviceController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -38,5 +39,8 @@ router
 router
   .route('/new/service/order')
   .post(isAuthenticatedUser, authorizeRoles('user'), newServiceOrder);
+
+// get single service order item
+router.route('/service/order-item/:id').get(getSingleServiceOrderItem);
 
 module.exports = router;

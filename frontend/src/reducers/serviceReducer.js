@@ -7,6 +7,9 @@ import {
   DELETE_SERVICE_REQUEST,
   DELETE_SERVICE_RESET,
   DELETE_SERVICE_SUCCESS,
+  GET_SERVICE_ITEM_FAIL,
+  GET_SERVICE_ITEM_REQUEST,
+  GET_SERVICE_ITEM_SUCCESS,
   SERVICE_CREATE_FAIL,
   SERVICE_CREATE_REQUEST,
   SERVICE_CREATE_RESET,
@@ -155,6 +158,34 @@ export const serviceReducer = (state = {}, { type, payload }) => {
       return {
         ...state,
         isDeleted: false,
+      };
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        error: null,
+      };
+    default:
+      return state;
+  }
+};
+
+// get service item reducer
+export const serviceItemReducer = (state = {}, { type, payload }) => {
+  switch (type) {
+    case GET_SERVICE_ITEM_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+    case GET_SERVICE_ITEM_SUCCESS:
+      return {
+        loading: false,
+        service: payload,
+      };
+    case GET_SERVICE_ITEM_FAIL:
+      return {
+        ...state,
+        error: payload,
       };
     case CLEAR_ERRORS:
       return {

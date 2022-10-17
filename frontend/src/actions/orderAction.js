@@ -185,9 +185,12 @@ export const updateOrderItem = (id, orderItem) => async (dispatch) => {
   try {
     dispatch({ type: UPDATE_ORDER_ITEM_REQUEST });
 
+    const config = { headers: { 'Content-Type': 'application/json' } };
+
     const { data } = await axios.put(
       `/api/v1/update/orderItems/${id}`,
-      orderItem
+      orderItem,
+      config
     );
     dispatch({
       type: UPDATE_ORDER_ITEM_SUCCESS,

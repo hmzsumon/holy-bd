@@ -80,7 +80,7 @@ CREATE TABLE services (
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     unit VARCHAR(255) NOT NULL,
-    unitPrice NUMERIC(20,2) NOT NULL,
+    unitPrice INT NOT NULL,
     icon_url VARCHAR(255) NOT NULL,
     icon_public_id VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

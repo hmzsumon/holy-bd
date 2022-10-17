@@ -4,8 +4,8 @@ CREATE TABLE service_orders (
     user_id INT NOT NULL,
     username VARCHAR(50) NOT NULL,
     item_qty INT NOT NULL,
-    discount NUMERIC(20,2) DEFAULT 0,
-    total NUMERIC(20,2) NOT NULL,
+    discount INT DEFAULT 0,
+    total INT NOT NULL,
     address VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
     order_status VARCHAR(255) DEFAULT 'processing',
@@ -32,11 +32,13 @@ CREATE TABLE service_order_items (
     service_id INT NOT NULL,
     service_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
-    unit_price NUMERIC(20,2) NOT NULL,
+    unit_price INT NOT NULL,
     unit VARCHAR(255) NOT NULL,
     icon_url VARCHAR(255) NOT NULL,
-    discount NUMERIC(20,2) DEFAULT 0,
-    total NUMERIC(20,2) NOT NULL,
+    discount INT DEFAULT 0,
+    total INT NOT NULL,
+    order_total INT NOT NULL,
+    odder_discount INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (service_order_id) REFERENCES service_orders(id),
@@ -60,3 +62,13 @@ const { rows: orders } = await db.query(
     'SELECT so.id, so.user_id, so.item_qty, so.total, so.address, so.city, so.state, so.zip, so.country, so.phone, so.status, so.created_at, so.updated_at, soi.service_id, soi.service_name, soi.quantity, soi.unit_price, soi.unit, soi.total FROM service_orders so INNER JOIN service_order_items soi ON so.id = soi.service_order_id WHERE so.user_id = $1',
     [user_id]
   );
+
+
+-- delete service_order by id
+DELETE FROM service_orders WHERE id = 1;
+
+-- delete multiple service_order_item 
+DELETE FROM service_order_items WHERE id IN (1,2,3);
+
+-- change service_order_item odder_discount to order_discount
+ALTER TABLE service_order_items RENAME COLUMN odder_discount TO order_discount;

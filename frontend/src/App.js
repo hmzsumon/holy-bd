@@ -7,6 +7,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import WebFont from 'webfontloader';
 import { loadUser } from './actions/userAction';
 import Dashboard from './components/Admin/Dashboard';
+import EditOrderItem from './components/Admin/EditOrderItem';
 import MainData from './components/Admin/MainData';
 import NewProduct from './components/Admin/NewProduct';
 import NewService from './components/Admin/NewService';
@@ -269,6 +270,17 @@ function App() {
             <ProtectedRoute isAdmin={true}>
               <Dashboard activeTab={2}>
                 <UpdateOrder />
+              </Dashboard>
+            </ProtectedRoute>
+          }
+        ></Route>
+
+        <Route
+          path='/admin/order/item/:id'
+          element={
+            <ProtectedRoute isAdmin={true}>
+              <Dashboard activeTab={2}>
+                <EditOrderItem />
               </Dashboard>
             </ProtectedRoute>
           }

@@ -4,7 +4,11 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { clearErrors, getOrderDetails } from '../../actions/orderAction';
+import {
+  clearErrors,
+  getOrderDetails,
+  updateOrder,
+} from '../../actions/orderAction';
 import { UPDATE_ORDER_RESET } from '../../constants/orderConstants';
 import { formatDate } from '../../utils/functions';
 import MetaData from '../Layouts/MetaData';
@@ -44,7 +48,7 @@ const UpdateOrder = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.set('status', status);
-    // dispatch(updateOrder(params.id, formData));
+    dispatch(updateOrder(params.id, formData));
   };
 
   return (
@@ -79,6 +83,14 @@ const UpdateOrder = () => {
                       <p className='font-medium'>Phone Number</p>
                       <p>{order.phone}</p>
                     </div>
+                    <div className='flex gap-2 text-sm'>
+                      <p className='font-medium'>Total Amount:</p>
+                      <p>{order.total} ৳</p>
+                    </div>
+                    <div className='flex gap-2 text-sm'>
+                      <p className='font-medium'>Total Discount:</p>
+                      <p>{order.discount} ৳</p>
+                    </div>
                   </div>
                 </div>
 
@@ -94,16 +106,16 @@ const UpdateOrder = () => {
                     })}
                   {/* Update Status */}
                   <h3 className='font-medium text-lg'>Update Status</h3>
-                  <div>
+                  <form onSubmit={updateOrderSubmitHandler}>
                     <div className='flex gap-2'>
                       <p className='text-sm font-medium'>Current Status:</p>
                       <p className='text-sm'>
-                        {order.orderStatus === 'Shipped' &&
+                        {order.order_status === 'Shipped' &&
                           `Shipped on ${formatDate(order.shipped_at)}`}
-                        {order.orderStatus === 'Processing' &&
+                        {order.order_status === 'Processing' &&
                           `Ordered on ${formatDate(order.created_at)}`}
-                        {order.orderStatus === 'Delivered' &&
-                          `Delivered on ${formatDate(order.deliveredAt)}`}
+                        {order.order_status === 'Delivered' &&
+                          `Delivered on ${formatDate(order.delivered_at)}`}
                       </p>
                     </div>
                     <div>
@@ -118,8 +130,8 @@ const UpdateOrder = () => {
                           label='Status'
                           onChange={(e) => setStatus(e.target.value)}
                         >
-                          {order.order_status === 'shipped' && (
-                            <MenuItem value={'delivered'}>Delivered</MenuItem>
+                          {order.order_status === 'Shipped' && (
+                            <MenuItem value={'Delivered'}>Delivered</MenuItem>
                           )}
                           {order.order_status === 'processing' && (
                             <MenuItem value={'Shipped'}>Shipped</MenuItem>
@@ -129,25 +141,28 @@ const UpdateOrder = () => {
                           )}
                         </Select>
                       </FormControl>
-                      <div className='flex flex-col w-full sm:w-1/2'>
+                      <div className='flex flex-col my-4 mx-auto w-full sm:w-1/2'>
                         <h3 className='font-medium sm:text-center'>
                           Order Status
                         </h3>
                         <TrackStepper
                           orderOn={order.created_at}
-                          shippedAt={order.shippedAt}
-                          deliveredAt={order.deliveredAt}
+                          shippedAt={order.shipped_at}
+                          deliveredAt={order.delivered_at}
                           activeStep={
-                            order.status === 'pending'
+                            order.order_status === 'processing'
                               ? 2
-                              : order.status === 'Shipped'
+                              : order.order_status === 'Shipped'
                               ? 1
                               : 0
                           }
                         />
                       </div>
+                      <button className=' w-full bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded'>
+                        Update Status
+                      </button>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>
